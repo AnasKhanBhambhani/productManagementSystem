@@ -6,10 +6,10 @@ export const meta: MetaFunction = () => {
     ];
 };
 
-export default function Index() {
+export default function Product() {
     return (
-        <>
-            <h1>home</h1>
-        </>
+        <div className=" my-16 w-full h-full max-w-[1500px] mx-auto mr-5 bg-orange-400">
+products
+     </div>
     );
 }

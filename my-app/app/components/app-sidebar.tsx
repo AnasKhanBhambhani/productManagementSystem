@@ -1,3 +1,4 @@
+import { useNavigate } from "@remix-run/react"
 import {
     Sidebar,
     SidebarContent,
@@ -8,50 +9,70 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "../components/ui/sidebar"
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
+import { Calendar, Home, Inbox, LogOut, Search } from "lucide-react"
 const items = [
     {
-        title: "Home",
+        title: "Dashboard",
         url: "home",
         icon: Home,
     },
     {
-        title: "Inbox",
-        url: "#",
+        title: "Products",
+        url: "products",
         icon: Inbox,
     },
     {
-        title: "Calendar",
+        title: "Categories",
         url: "#",
         icon: Calendar,
     },
     {
-        title: "Search",
+        title: "Control Products",
         url: "#",
         icon: Search,
     },
     {
-        title: "Settings",
-        url: "#",
-        icon: Settings,
+        title: "Log Out",
+        url: "/logout",
+        icon: LogOut,
     },
 ]
 export function AppSidebar() {
+    const navigate = useNavigate();
+    const handleLogout = async () => {
+        try {
+            const response = await fetch('/logout', {
+                method: 'POST',
+            });
+            if (response.ok) {
+                navigate('/login');
+            } else {
+                console.error('Failed to log out');
+            }
+        } catch (error) {
+            console.error('Error during logout:', error);
+        }
+    }
     return (
         <Sidebar>
             <SidebarContent>
                 <SidebarGroup>
-                    <SidebarGroupLabel>Application</SidebarGroupLabel>
+                    <SidebarGroupLabel>Product Management System</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {items.map((item) => (
                                 <SidebarMenuItem key={item.title}>
-                                    <SidebarMenuButton asChild>
+                                    {item.title == 'Log Out' ? <SidebarMenuButton onClick={handleLogout} asChild>
+                                        <div className="cursor-pointer">
+                                            <item.icon />
+                                            <span>{item.title}</span>
+                                        </div>
+                                    </SidebarMenuButton> : <SidebarMenuButton asChild>
                                         <a href={item.url}>
                                             <item.icon />
                                             <span>{item.title}</span>
                                         </a>
-                                    </SidebarMenuButton>
+                                    </SidebarMenuButton>}
                                 </SidebarMenuItem>
                             ))}
                         </SidebarMenu>
