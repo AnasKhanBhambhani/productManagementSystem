@@ -8,16 +8,24 @@ export const action: ActionFunction = async ({ request }: ActionFunctionArgs) =>
     const formData = await request.formData();
     const email = formData.get('email');
     const password = formData.get('password');
-    const user = {
+    const admin = {
         email: 'anashamza457@gmail.com',
         password: '12345',
     }
-    if (user.email === email && user.password === password) {
-        console.log('====================================');
-        console.log('working');
-        console.log('====================================');
+    const user = {
+        email: 'anas@gmail.com',
+        password: '12345',
+    }
+    if (admin.email === email && admin.password === password) {
         const session = await getSession();
-        session.set('email', email);
+        session.set('status', 'admin');
+        return redirect("/dashboard/home", {
+            headers: { "Set-Cookie": await commitSession(session) },
+        });
+    }
+    else if(user.email === email && user.password === password){
+        const session = await getSession();
+        session.set('status', 'user');
         return redirect("/dashboard/home", {
             headers: { "Set-Cookie": await commitSession(session) },
         });
@@ -29,9 +37,6 @@ export const action: ActionFunction = async ({ request }: ActionFunctionArgs) =>
 
 export default function LoginPage() {
     const actionData = useActionData<typeof action>();
-    console.log('====================================');
-    console.log(actionData?.error);
-    console.log('====================================');
     return (
         <div className="w-full flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
             <div className="text-red-500 my-2">{actionData?.error}</div>

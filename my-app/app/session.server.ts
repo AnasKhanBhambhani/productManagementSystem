@@ -5,24 +5,28 @@ if (!sessionSecret) {
   throw new Error("SESSION_SECRET must be set");
 }
 
-const { getSession, commitSession, destroySession } = createCookieSessionStorage({
-  cookie: {
-    name: "__session",
-    secure: process.env.NODE_ENV === "production", 
-    secrets: [sessionSecret],
-    sameSite: "lax",
-    path: "/",
-    httpOnly: true,
-  },
-});
+const { getSession, commitSession, destroySession } =
+  createCookieSessionStorage({
+    cookie: {
+      name: "__session",
+      secure: process.env.NODE_ENV === "production",
+      secrets: [sessionSecret],
+      sameSite: "lax",
+      path: "/",
+      httpOnly: true,
+    },
+  });
 
 export { getSession, commitSession, destroySession };
 
 export async function requireUserSession(request: Request) {
   const session = await getSession(request.headers.get("Cookie"));
-  const userEmail = session.get("email");
-  if (!userEmail) {
+  const useStatus = session.get("status");
+  console.log('====================================');
+  console.log(useStatus, 'uses');
+  console.log('====================================');
+  if (!useStatus) {
     throw redirect("/login");
   }
-  return userEmail;
+  return useStatus;
 }

@@ -1,8 +1,11 @@
 import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 import { SidebarProvider, SidebarTrigger } from "../components/ui/sidebar";
 import { AppSidebar } from "../components/app-sidebar";
-import { json, Outlet,} from "@remix-run/react";
+import { json, Outlet, useLoaderData,} from "@remix-run/react";
 import { requireUserSession } from "../session.server";
+type Status = {
+    status:string,
+}
 export const meta: MetaFunction = () => {
     return [
         { title: "New Remix App" },
@@ -10,13 +13,14 @@ export const meta: MetaFunction = () => {
     ];
 };
 export const loader: LoaderFunction = async ({ request }) => {
-    const userId = await requireUserSession(request);
-    return json({ message: `Welcome user ${userId}` });
+    const logStatus = await requireUserSession(request);
+    return json({ status: logStatus });
 };
 export default function Dashboard() {
+    const {status}:Status = useLoaderData<typeof loader>();
     return (
         <SidebarProvider>
-            <AppSidebar />
+            <AppSidebar status={status} />
             <main>
                 <SidebarTrigger />
             </main>

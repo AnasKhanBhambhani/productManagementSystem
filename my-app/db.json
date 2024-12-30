@@ -1,0 +1,11 @@
+{
+  "products": [
+    {
+      "id": "1",
+      "name": "cameraa",
+      "description": "this is nekon camera",
+      "price": "22",
+      "ProductImage": "https://mrtmjgjwmaaxhzdrmowt.supabase.co/storage/v1/object/public/ProductImages/1735561235528-tree-3092026_640.jpg"
+    }
+  ]
+}

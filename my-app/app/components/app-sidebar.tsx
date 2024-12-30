@@ -9,7 +9,10 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "../components/ui/sidebar"
-import { Calendar, Home, Inbox, LogOut, Search } from "lucide-react"
+import { Home, Inbox, LogOut, Search } from "lucide-react"
+interface AppSidebarProps {
+    status: string;
+}
 const items = [
     {
         title: "Dashboard",
@@ -22,14 +25,10 @@ const items = [
         icon: Inbox,
     },
     {
-        title: "Categories",
-        url: "#",
-        icon: Calendar,
-    },
-    {
         title: "Control Products",
-        url: "#",
+        url: "productcontrol",
         icon: Search,
+        adminOnly: true,
     },
     {
         title: "Log Out",
@@ -37,7 +36,14 @@ const items = [
         icon: LogOut,
     },
 ]
-export function AppSidebar() {
+
+export function AppSidebar({ status }: AppSidebarProps) {
+    const filteredItems = items.filter(
+        (item) => !item.adminOnly || status === "admin"
+    );
+    console.log('====================================');
+    console.log(status, 'anas');
+    console.log('====================================');
     const navigate = useNavigate();
     const handleLogout = async () => {
         try {
@@ -57,10 +63,10 @@ export function AppSidebar() {
         <Sidebar>
             <SidebarContent>
                 <SidebarGroup>
-                    <SidebarGroupLabel>Product Management System</SidebarGroupLabel>
+                    <SidebarGroupLabel>{status === 'admin' ? 'Welcome Admin' : 'Welcome User'}</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {items.map((item) => (
+                            {filteredItems.map((item) => (
                                 <SidebarMenuItem key={item.title}>
                                     {item.title == 'Log Out' ? <SidebarMenuButton onClick={handleLogout} asChild>
                                         <div className="cursor-pointer">
