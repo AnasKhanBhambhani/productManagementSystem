@@ -35,7 +35,6 @@ export const action: ActionFunction = async ({ request }: ActionFunctionArgs) =>
     if (!img) {
         return { error: 'Image file is required' };
     }
-
     const fileBuffer = await img.arrayBuffer();
     const fileUpload = `${Date.now()}-${img.name}`
     const { error } = await supabase.storage
@@ -45,31 +44,29 @@ export const action: ActionFunction = async ({ request }: ActionFunctionArgs) =>
             upsert: false,
         });
 
-
-
     if (error) {
-        console.error(error);
+        console.error(error, 'dddd');
         return { error: error.message };
     }
-    try {
-        const { data: fileName } = await supabase
-            .storage
-            .from('ProductImages')
-            .getPublicUrl(fileUpload);
-        const ProductImage = fileName.publicUrl;
-        const validatedData = productSchema.parse({ name, description, price })
 
+    const { data: fileName } = await supabase.storage
+        .from('ProductImages')
+        .getPublicUrl(fileUpload);
+    const ProductImage = fileName.publicUrl;
+  
+    try {
+        const validatedData = productSchema.parse({ name, description, price })
         const response = await fetch("http://localhost:3001/products", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ ...validatedData, ProductImage }),
+            body: JSON.stringify({ ...validatedData, ProductImage}),
         });
         if (!response.ok) {
             throw new Error("Failed to post data");
         }
-       return redirect('/dashboard/products');
+        return redirect('/dashboard/products');
     } catch (error) {
         if (error instanceof z.ZodError) {
             const validationErrors = error.format();
@@ -81,6 +78,7 @@ export const action: ActionFunction = async ({ request }: ActionFunctionArgs) =>
 
 export default function Product() {
     const result = useActionData<actionData>();
+    // const { v4: uuidv4 } = require('uuid');
     return (
         <div className="my-16 w-full h-full max-w-[1500px] gap-5 mx-auto mr-5 flex flex-col justify-center">
             <div className="flex justify-center">
@@ -112,6 +110,7 @@ export default function Product() {
                             {result.errors.fileName._errors[0]}
                         </p>
                     )}
+
                     <Button type="submit">Add Product</Button>
                 </div>
             </Form>

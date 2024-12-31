@@ -41,9 +41,6 @@ export function AppSidebar({ status }: AppSidebarProps) {
     const filteredItems = items.filter(
         (item) => !item.adminOnly || status === "admin"
     );
-    console.log('====================================');
-    console.log(status, 'anas');
-    console.log('====================================');
     const navigate = useNavigate();
     const handleLogout = async () => {
         try {

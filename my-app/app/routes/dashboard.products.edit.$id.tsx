@@ -1,10 +1,4 @@
-import type { MetaFunction } from "@remix-run/node";
-export const meta: MetaFunction = () => {
-    return [
-        { title: "New Remix App" },
-        { name: "description", content: "Welcome to Remix!" },
-    ];
-};
+import type { ActionFunction, LoaderFunction, MetaFunction } from "@remix-run/node";
 import {
     Dialog,
     DialogContent,
@@ -13,17 +7,51 @@ import {
     DialogHeader,
     DialogTitle,
 } from "../components/ui/dialog"
-import { Form } from "@remix-run/react";
+import invariant from 'tiny-invariant'
+import { Form, json, useLoaderData, useNavigate } from "@remix-run/react";
+import { redirect } from "@remix-run/node";
 import { Label } from "~/components/ui/label";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
+import { useState } from "react";
+import { fetchProductById, updateProduct } from "~/Apis/product";
+import { Products } from "~/types/product";
 
+export const meta: MetaFunction = () => {
+    return [
+        { title: "New Remix App" },
+        { name: "description", content: "Welcome to Remix!" },
+    ];
+};
 
+export const loader: LoaderFunction = async ({ params }) => {
+    invariant(params.id, "Id must be present")
+    const data = await fetchProductById(params.id)
+    return json(data);
+}
+
+export const action: ActionFunction = async ({ params, request }) => {
+    const formData = await request.formData();
+    const updateData = {
+        name: formData.get('name'),
+        description: formData.get('description'),
+        price: formData.get('price'),
+    }
+    const id = params.id;
+    await updateProduct(id, updateData)
+    return redirect('/dashboard');
+}
 
 export default function Product() {
+    const product: Products = useLoaderData();
+    const navigate = useNavigate()
+    const [toggle, setToggle] = useState(true)
+    const handleClose = () => {
+        setToggle(false)
+    }
     return (
-        <Dialog open>
-            <DialogContent className="sm:max-w-[425px]">
+        <Dialog open={toggle} onOpenChange={handleClose}>
+            <DialogContent className="sm:max-w-[425px]" onCloseAutoFocus={() => navigate('/dashboard/products')}>
                 <DialogHeader>
                     <DialogTitle>Edit Product Profile</DialogTitle>
                     <DialogDescription>
@@ -39,7 +67,7 @@ export default function Product() {
                             <Input
                                 id="name"
                                 name="name"
-                                defaultValue={selectedProduct?.name || ''}
+                                defaultValue={product?.name || ''}
                                 className="col-span-3"
                             />
                         </div>
@@ -50,7 +78,8 @@ export default function Product() {
                             <Input
                                 id="description"
                                 name="description"
-                                defaultValue={selectedProduct?.description || ''}
+                                defaultValue={product?.description || ''}
+
                                 className="col-span-3"
                             />
                         </div>
@@ -61,15 +90,15 @@ export default function Product() {
                             <Input
                                 id="price"
                                 name="price"
-                                defaultValue={selectedProduct?.price || ''}
+                                defaultValue={product?.price || ''}
                                 className="col-span-3"
                             />
                         </div>
                     </div>
+                    <DialogFooter>
+                        <Button type="submit">Save changes</Button>
+                    </DialogFooter>
                 </Form>
-                <DialogFooter>
-                    <Button type="submit">Save changes</Button>
-                </DialogFooter>
             </DialogContent>
         </Dialog>
     );

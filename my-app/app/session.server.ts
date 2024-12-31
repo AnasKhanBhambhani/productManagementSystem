@@ -22,9 +22,6 @@ export { getSession, commitSession, destroySession };
 export async function requireUserSession(request: Request) {
   const session = await getSession(request.headers.get("Cookie"));
   const useStatus = session.get("status");
-  console.log('====================================');
-  console.log(useStatus, 'uses');
-  console.log('====================================');
   if (!useStatus) {
     throw redirect("/login");
   }
